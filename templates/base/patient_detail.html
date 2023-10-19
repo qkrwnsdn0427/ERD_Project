@@ -1,0 +1,32 @@
+{% extends 'basic.html' %}
+{% block content %}
+<h1>Patient Detail</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ patient.image }}" alt="{{ patient.last_name }} {{ patient.first_name }}" class="img-fluid">
+        </div>
+        <div class="col-md-8">
+            <h2>{{ patient.last_name }} {{ patient.first_name }}</h2>
+            <dl class="row">
+                <dt class="col-md-3">생년월일:</dt>
+                <dd class="col-md-9">{{ patient.birth_date }}</dd>
+
+                <dt class="col-md-3">성별:</dt>
+                <dd class="col-md-9">{{ patient.get_gender_display }}</dd>
+
+                <dt class="col-md-3">주소:</dt>
+                <dd class="col-md-9">{{ patient.address }}</dd>
+
+                <dt class="col-md-3">전화번호:</dt>
+                <dd class="col-md-9">{{ patient.phone_num }}</dd>
+
+                {% if patient.email %}
+                <dt class="col-md-3">이메일:</dt>
+                <dd class="col-md-9">{{ patient.email }}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}

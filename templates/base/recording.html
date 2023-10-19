@@ -1,0 +1,28 @@
+{% extends 'basic.html' %}
+{% block content %}
+<meta charset="UTF-8">
+
+<div class="진료기록">
+    <h2>진료기록</h2>
+    <form method="post">
+        <div class="증상">
+        <h3>증상 및 상병</h3>
+        {% csrf_token %}
+        {{ diagnostic_form.as_p }}
+        </div>
+        <div class="prescription-form-section">
+        <h3>처방</h3>
+        {% csrf_token %}
+        {{ prescription_form.as_p }}
+        </div>
+        <div class="prescription-form-section">
+        <h3>재활 및 치료</h3>
+        {% csrf_token %}
+        {{ treatment_form.as_p }}
+        {{ exercise_form.as_p }}
+        <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends 'basic.html' %}
+{% block content %}
+<meta charset="UTF-8">
+<!--<div class="left-column">-->
+<!--    <div class="user-section">-->
+<!--        <table class="table table-bordered table-hover">-->
+<!--            <tbody>-->
+<!--                <tr>-->
+<!--                    <td>{{ user.name }}</td>-->
+<!--                    <td>{{ user.department }}</td>-->
+<!--                    <td>{{ user.position }}</td>-->
+<!--                    <td>{{ user.role }}</td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--        </table>-->
+<!--    </div>-->
+<!--</div>-->
+<div class="환자정보">
+    <div class="patient-section">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tbody>
+                <tr>
+                    <td>{{ patient.last_name }}{{ patient.first_name }}</td>
+                    <td>{{ patient.birth_date|date:"Ymd" }}</td>
+                    <td>{{ patient.get_gender_display }}</td>
+                    <td>{{ patient.phone_num }}</td>
+                </tr>
+                </tbody>
+        </table>
+<!--        <p>ID: {{ patient.id }}</p>-->
+<!--        <p>Last Name: {{ patient.last_name }}</p>-->
+<!--        <p>First Name: {{ patient.first_name }}</p>-->
+<!--        <p>Birth Date: {{ patient.birth_date }}</p>-->
+<!--        <p>Gender: {{ patient.get_gender_display }}</p>-->
+<!--        <p>Phone Number: {{ patient.phone_num }}</p>-->
+    </div>
+</div>
+<div class="신체계측/바이탈/시각자료">
+     <h2>신체계측/바이탈/시각자료</h2>
+    <div class="test-records-section">
+        {% if test_records %}
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>날짜</th>
+                <th>골격근량</th>
+                <th>체지방량</th>
+                <th>심폐지구력</th>
+                <th>민첩성</th>
+                <th>유연성</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in test_records %}
+            <tr>
+                <td>{{ record.date }}</td>
+                <td>{{ record.MuscleMass }}</td>
+                <td>{{ record.BodyFatMass }}</td>
+                <td>{{ record.cardio_endurance }}</td>
+                <td>{{ record.agility }}</td>
+                <td>{{ record.flexibility }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>검사 기록이 없습니다.</p>
+        {% endif %}
+<!--        <table class="table table-bordered table-hover">-->
+<!--            <thead>-->
+<!--                <tbody>-->
+<!--                {% for record in test_records %}-->
+<!--                <tr>-->
+<!--                    <td>{{ patient.last_name }}{{ patient.first_name }}</td>-->
+<!--                    <td>{{ patient.birth_date|date:"Ymd" }}</td>-->
+<!--                    <td>{{ patient.get_gender_display }}</td>-->
+<!--                    <td>{{ patient.phone_num }}</td>-->
+<!--                </tr>-->
+<!--                {% endfor %}-->
+<!--                </tbody>-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--        {% for record in test_records %}-->
+<!--        <p>Date: {{ record.date }}</p>-->
+<!--        <p>BodyFatMass: {{ record.BodyFatMass }}</p>-->
+<!--        <p>Muscle Mass: {{ record.MuscleMass }}</p>-->
+<!--        <p>cardio endurance: {{ record.cardio_endurance }}</p>-->
+<!--        <p>Agility: {{ record.agility }}</p>-->
+<!--        <p>Flexibility: {{ record.flexibility }}</p>-->
+<!--        {% endfor %}-->
+    </div>
+    <div class="media-records-section">
+        {% if media_records %}
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>인바디</th>
+                <th>비디오</th>
+                <th>Xray</th>
+                <th>특이사항</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for media in media_records %}
+            <tr>
+                <td>{{ media.inbody_url }}</td>
+                <td>{{ media.video_url }}</td>
+                <td>{{ media.xray_url }}</td>
+                <td>{{ media.Field4 }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>검사 기록이 없습니다.</p>
+        {% endif %}
+<!--    <div class="media-records-section">-->
+<!--        {% for media in media_records %}-->
+<!--        <p>Inbody URL: {{ media.inbody_url }}</p>-->
+<!--        <p>Video URL: {{ media.video_url }}</p>-->
+<!--        <p>Xray URL: {{ media.xray_url }}</p>-->
+<!--        <p>Field4: {{ media.Field4 }}</p>-->
+<!--        {% endfor %}-->
+    </div>
+</div>
+
+<div class="진료기록">
+    <h2>진료기록</h2>
+    <div class="diagnostic-records-section">
+        {% if diagnostic_records %}
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>일자</th>
+                <th>증상</th>
+                <th>상병/진단</th>
+                <th>특이사항</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in diagnostic_records %}
+            <tr>
+                <td>{{ record.diagnosis_date }}</td>
+                <td>{{ record.symptoms }}</td>
+                <td>{{ record.diagnosis }}</td>
+                <td>{{ record.comments }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>진료 기록이 없습니다.</p>
+        {% endif %}
+<!--        {% for record in diagnostic_records %}-->
+<!--        <p>Symptoms: {{ record.symptoms }}</p>-->
+<!--        <p>Diagnosis: {{ record.diagnosis }}</p>-->
+<!--        <p>Comments: {{ record.comments }}</p>-->
+<!--        {% endfor %}-->
+    </div>
+    <div class="prescriptions-section">
+        {% if prescriptions %}
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>약</th>
+                <th>총 투여량</th>
+                <th>횟수</th>
+                <th>기간(일)</th>
+                <th>단위</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in prescriptions %}
+            <tr>
+                <td>{{ record.medicine }}</td>
+                <td>{{ record.dosage }}</td>
+                <td>{{ record.times }}</td>
+                <td>{{ record.days }}</td>
+                <td>{{ record.unit }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>처방 기록이 없습니다.</p>
+        {% endif %}
+<!--        {% for record in prescriptions %}-->
+<!--        <p>Medicine: {{ record.medicine }}</p>-->
+<!--        <p>Dosage: {{ record.dosage }}</p>-->
+<!--        <p>Times: {{ record.times }}</p>-->
+<!--        <p>Days: {{ record.days }}</p>-->
+<!--        <p>Unit : {{ record.unit  }}</p>-->
+<!--        {% endfor %}-->
+    </div>
+</div>
+<div class="재활 및 치료기록">
+    <h2>재활 및 치료기록</h2>
+    <div class="treatment-records-section">
+        {% if treatment_records %}
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>일자</th>
+                <th>치료명</th>
+                <th>기간(일)</th>
+                <th>시간(분)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in treatment_records %}
+            <tr>
+                <td>{{ record.date }}</td>
+                <td>{{ record.treatment_type }}</td>
+                <td>{{ record.duration }}</td>
+                <td>{{ record.time }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>치료 기록이 없습니다.</p>
+        {% endif %}
+<!--        {% for record in treatment_records %}-->
+<!--        <p>Treatment type: {{ record.treatment_type }}</p>-->
+<!--        <p>Duration: {{ record.duration }}</p>-->
+<!--        <p>Time: {{ record.time }}</p>-->
+<!--        {% endfor %}-->
+    </div>
+    <div class="exercise-records-section">
+        {% if exercise_records %}
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>일자</th>
+                <th>운동 종류</th>
+                <th>중량</th>
+                <th>횟수</th>
+                <th>시간(분)</th>
+                <th>속도</th>
+                <th>거리</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in exercise_records %}
+            <tr>
+                <td>{{ record.date }}</td>
+                <td>{{ record.exercise_type }}</td>
+                <td>{{ record.weight }}</td>
+                <td>{{ record.iteration }}</td>
+                <td>{{ record.duration }}</td>
+                <td>{{ record.speed }}</td>
+                <td>{{ record.distance }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>재활 기록이 없습니다.</p>
+        {% endif %}
+<!--        {% for record in exercise_records %}-->
+<!--        <p>Exercise type: {{ record.exercise_type }}</p>-->
+<!--        {% endfor %}-->
+    </div>
+</div>
+
+
+<!--<div class="진료기록">-->
+<!--    <h2>진료기록</h2>-->
+<!--    <form method="post">-->
+<!--        <div class="증상">-->
+<!--        <h3>증상</h3>-->
+<!--        {% csrf_token %}-->
+<!--        {{ diagnostic_form.as_p }}-->
+<!--        <h3>상병</h3>-->
+<!--        </div>-->
+<!--        <div class="prescription-form-section">-->
+<!--        <h3>처방</h3>-->
+<!--        {% csrf_token %}-->
+<!--        {{ prescription_form.as_p }}-->
+<!--        </div>-->
+<!--        <div class="prescription-form-section">-->
+<!--        <h3>재활 및 치료</h3>-->
+<!--        {% csrf_token %}-->
+<!--        {{ treatment_form.as_p }}-->
+<!--        {{ exercise_form.as_p }}-->
+<!--        <input type="submit" value="Submit">-->
+<!--        </div>-->
+<!--    </form>-->
+<!--</div>-->
+
+
+
+{% endblock %}
