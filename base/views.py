@@ -3,7 +3,11 @@ from django.utils import timezone
 from .models import Patient, TestRecords, MediaRecords, DiagnosticRecords, Prescription, TreatmentRecords, \
     ExerciseRecords, User
 from .forms import PatientForm, DiagnosticRecordsForm, PrescriptionForm, TreatmentRecordsForm, ExerciseRecordsForm
-
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 
 def index(request):
     patient_list = Patient.objects.order_by('last_name', 'first_name')
@@ -27,6 +31,15 @@ def create_patient(request):
     context = {'form': form}
     return render(request, 'base/patient_form.html', context)
 
+class LoginAPIView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')
+        password = request.data.get('password')
+        user = authenticate(request, user_id=user_id, password=password)
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 def emr(request, patient_id):
     patient = Patient.objects.get(id=patient_id)

@@ -1,5 +1,62 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, UserManager, PermissionsMixin
+
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, user_id, password=None, **extra_fields):
+        if not user_id:
+            raise ValueError('The given user_id must be set')
+        user = self.model(user_id=user_id, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, user_id, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(user_id, password, **extra_fields)
+
+# User 모델 정의
+class User(AbstractBaseUser, PermissionsMixin):
+    # Fields
+    user_id = models.CharField(max_length=15, unique=True)
+    name = models.CharField(max_length=50)
+    birth_date = models.DateField()
+    address = models.CharField(max_length=255)
+    gender = models.CharField(max_length=1, choices=[('M', '남성'), ('F', '여성')])
+    phone_num = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)  # Set unique=True for email
+    department = models.CharField(max_length=50, blank=True)
+    position = models.CharField(max_length=50, blank=True)
+    role = models.CharField(max_length=10, choices=[
+        ('관리자', '관리자'),
+        ('의사', '의사'),
+        ('물리 치료사', '물리 치료사'),
+        ('기타 의료진', '기타 의료진'),
+        ('환자', '환자'),
+        ('간호사', '간호사'),
+    ])
+
+    # Boolean fields
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    # Custom user manager
+    objects = CustomUserManager()
+
+    # Set the username field
+    USERNAME_FIELD = 'user_id'
+    REQUIRED_FIELDS = ['email', 'name', 'birth_date', 'address', 'gender', 'phone_num', 'role']
+
+    def __str__(self):
+        return self.user_id
 
 # Patient 모델 정의
 class Patient(models.Model):
@@ -20,35 +77,6 @@ class Patient(models.Model):
     def __str__(self):
         return self.first_name
 
-# User 모델 정의
-class User(models.Model):
-    id = models.AutoField(primary_key=True)  # id 필드를 다시 추가
-    user_id = models.CharField(max_length=15, null=False)
-    user_pw = models.CharField(max_length=100, null=False)
-    name = models.CharField(max_length=50, null=False)
-    birth_date = models.DateField(null=False)
-    address = models.CharField(max_length=255, null=False)
-    GENDER_CHOICES = [
-        ('M', '남성'),
-        ('F', '여성'),
-    ]
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=False)
-    phone_num = models.CharField(max_length=15, null=False)
-    email = models.CharField(max_length=100, null=True)
-    department = models.CharField(max_length=50, null=True)
-    position = models.CharField(max_length=50, null=True)
-    ROLE_CHOICES = [
-        ('관리자', '관리자'),
-        ('의사', '의사'),
-        ('물리 치료사', '물리 치료사'),
-        ('기타 의료진', '기타 의료진'),
-        ('환자', '환자'),
-        ('간호사', '간호사'),
-    ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, null=False)
-
-    def __str__(self):
-        return self.user_id
 
 class TestRecords(models.Model):
     test_code = models.AutoField(primary_key=True)

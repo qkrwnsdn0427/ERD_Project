@@ -22,4 +22,6 @@ urlpatterns = [
     path('base/', include('base.urls')),
     path('common/', include('common.urls')),
     path('',views.index, name='index'),
+    path('api-auth/', include('rest_framework.urls')),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
 ]
