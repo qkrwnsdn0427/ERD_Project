@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from .views import LoginAPIView
+from .views import UserRegistrationAPIView
+from .views import logout_view
 
 app_name = 'base'
 
@@ -12,4 +14,6 @@ urlpatterns = [
     path('recording/<int:patient_id>/', views.recording, name='recording'),
     path('login/', LoginAPIView.as_view(), name='login'),
     # path('emr/<int:patient_id>/<int:user_id>/', views.emr, name='emr'),
+    path('register/', UserRegistrationAPIView.as_view(), name='register'),
+    path('logout/', logout_view, name='logout'),
 ]
