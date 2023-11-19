@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Patient, TestRecords, MediaRecords, DiagnosticRecords, Prescription, TreatmentRecords, \
-    ExerciseRecords, User
-from .forms import PatientForm, DiagnosticRecordsForm, PrescriptionForm, TreatmentRecordsForm, ExerciseRecordsForm
+    ExerciseRecords, User, Appointments
+from .forms import PatientForm, DiagnosticRecordsForm, PrescriptionForm, TreatmentRecordsForm, ExerciseRecordsForm, \
+    AppointmentForm
 from django.contrib.auth import authenticate, logout
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -10,17 +11,23 @@ from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import UserRegistrationSerializer
 from rest_framework.generics import CreateAPIView
-
+from datetime import datetime
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_datetime
+from django.contrib.auth.decorators import login_required
 
 def index(request):
     patient_list = Patient.objects.order_by('last_name', 'first_name')
     context = {'patient_list': patient_list}
     return render(request, 'base/patient_list.html', context)
 
+
 def detail(request, Patient_id):
     patient = Patient.objects.get(id=Patient_id)
-    context = {'patient' : patient}
-    return render(request, 'base/patient_detail.html',context)
+    context = {'patient': patient}
+    return render(request, 'base/patient_detail.html', context)
+
 
 def create_patient(request):
     if request.method == 'POST':
@@ -33,6 +40,7 @@ def create_patient(request):
         form = PatientForm()
     context = {'form': form}
     return render(request, 'base/patient_form.html', context)
+
 
 # class LoginAPIView(APIView):
 #     def post(self, request):
@@ -54,7 +62,9 @@ class LoginAPIView(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
 
-        return Response({'error': 'Invalid Credentials. Please check your user ID and password.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Invalid Credentials. Please check your user ID and password.'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
 
 def emr(request, patient_id):
     patient = Patient.objects.get(id=patient_id)
@@ -98,7 +108,8 @@ def emr(request, patient_id):
     # }
     return render(request, 'base/emr.html', context)
 
-def recording(request,patient_id=None):
+
+def recording(request, patient_id=None):
     patient = None
     if patient_id:
         patient = Patient.objects.get(id=patient_id)
@@ -145,6 +156,63 @@ class UserRegistrationAPIView(CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED, headers=headers)
 
+
 def logout_view(request):
     logout(request)
     return redirect('/base/')
+
+
+def appointment_list(request):
+    selected_date_str = request.GET.get('date', timezone.now().date().strftime('%Y-%m-%d'))
+    try:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        selected_date = timezone.now().date()
+
+    # Filter appointments by the logged-in doctor and the selected date
+    appointments = Appointments.objects.filter(doctor=request.user, appointment_date=selected_date).order_by('appointment_time')
+
+    return render(request, 'base/appointments_list.html', {'appointments': appointments, 'selected_date': selected_date})
+@csrf_exempt
+def update_appointment_status(request, appointment_id):
+    if request.method == 'POST':
+        appointment = Appointments.objects.get(id=appointment_id)
+        status = request.POST.get('status')
+        if status in [Appointments.PENDING, Appointments.IN_PROGRESS, Appointments.COMPLETED]:
+            appointment.status = status
+            appointment.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'invalid status'}, status=400)
+    return JsonResponse({'status': 'bad request'}, status=400)
+
+
+# def create_appointment(request):
+#     if request.method == 'POST':
+#         form = AppointmentForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('appointment_list')
+#     else:
+#         form = AppointmentForm()
+#     return render(request, 'base/appointments_create.html', {'form': form})
+def create_appointment(request):
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            # 폼 데이터가 유효하면, 새로운 예약 인스턴스를 생성하지만, 아직 저장하지는 않습니다.
+            new_appointment = form.save(commit=False)
+
+            # 예약 날짜와 시간을 모델 인스턴스에 할당합니다.
+            new_appointment.appointment_date = form.cleaned_data['appointment_date']
+            new_appointment.appointment_time = form.cleaned_data['appointment_time']
+
+            # 예약 인스턴스를 저장합니다.
+            new_appointment.save()
+
+            # 예약 목록 페이지로 리디렉션합니다.
+            return redirect('/')
+    else:
+        form = AppointmentForm()
+
+    return render(request, 'base/appointments_create.html', {'form': form})

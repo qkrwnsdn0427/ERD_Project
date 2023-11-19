@@ -16,4 +16,8 @@ urlpatterns = [
     # path('emr/<int:patient_id>/<int:user_id>/', views.emr, name='emr'),
     path('register/', UserRegistrationAPIView.as_view(), name='register'),
     path('logout/', logout_view, name='logout'),
+    path('appointments/', views.appointment_list, name='appointment_list'),
+    path('appointments/create/', views.create_appointment, name='create_appointment'),
+    path('update_appointment_status/<int:appointment_id>/', views.update_appointment_status,
+         name='update_appointment_status'),
 ]

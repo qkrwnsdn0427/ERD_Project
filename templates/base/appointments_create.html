@@ -1,0 +1,18 @@
+{% extends 'basic.html' %}
+{% block content %}
+<h2>예약 생성</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">예약 완료</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var appointmentTimeInput = document.querySelector('input[type="time"]');
+    if (appointmentTimeInput) {
+        appointmentTimeInput.step = 600; // 10 minute units
+    }
+});
+</script>
+{% endblock %}

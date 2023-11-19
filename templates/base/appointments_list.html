@@ -1,0 +1,42 @@
+{% extends 'basic.html' %}
+{% load static %}
+{% block content %}
+<h2>예약 목록</h2>
+<form method="get" action="">
+    <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+    <button type="submit">날짜 선택</button>
+</form>
+<p>날짜: {{ selected_date }}</p>
+
+{% if appointments %}
+    <!-- 모든 예약이 같은 의사를 위한 것이라고 가정 -->
+    <div>
+        <h3>의사 정보</h3>
+        <p>이름: {{ appointments.first.doctor.name }}</p>
+        <p>과: {{ appointments.first.doctor.department }}</p>
+        <p>치료실: {{ appointments.first.doctor.position }}</p>
+        <p>대기 인원 수: {{ appointments.count }}</p>
+    </div>
+
+    {% for appointment in appointments %}
+        <div>
+            <h3>환자 정보</h3>
+            <p>이름: {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</p>
+            <p>예약 시간: {{ appointment.appointment_time }}</p>
+            <p>고유 ID: {{ appointment.patient.id }}</p>
+            <p>생년월일: {{ appointment.patient.birth_date }}</p>
+            <p>성별: {{ appointment.patient.get_gender_display }}</p>
+            <p>증상: {{ appointment.symptoms }}</p>
+            <p>목적: {{ appointment.purpose }}</p>
+            <button class="call-patient" data-appointment-id="{{ appointment.id }}">환자 호출</button>
+            <button class="complete-appointment" data-appointment-id="{{ appointment.id }}" style="display: none;">치료 완료</button>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>이 날짜에는 예약이 없습니다.</p>
+{% endif %}
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'appointment_list.js' %}"></script>
+<script src="{% static 'appointment_event.js' %}"></script>
+{% endblock %}
