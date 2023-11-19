@@ -20,4 +20,5 @@ urlpatterns = [
     path('appointments/create/', views.create_appointment, name='create_appointment'),
     path('update_appointment_status/<int:appointment_id>/', views.update_appointment_status,
          name='update_appointment_status'),
+    path('appointments/complete/<int:appointment_id>/', views.complete_appointment, name='complete_appointment'),
 ]

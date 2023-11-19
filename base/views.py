@@ -169,10 +169,21 @@ def appointment_list(request):
     except ValueError:
         selected_date = timezone.now().date()
 
-    # Filter appointments by the logged-in doctor and the selected date
-    appointments = Appointments.objects.filter(doctor=request.user, appointment_date=selected_date).order_by('appointment_time')
+    # Filter appointments by the logged-in doctor, the selected date, and exclude completed appointments
+    appointments = Appointments.objects.filter(
+        doctor=request.user,
+        appointment_date=selected_date,
+        status__in=[Appointments.PENDING, Appointments.IN_PROGRESS]
+    ).order_by('appointment_time')
 
-    return render(request, 'base/appointments_list.html', {'appointments': appointments, 'selected_date': selected_date})
+    # Assuming the logged-in user is the doctor
+    doctor = request.user
+
+    return render(request, 'base/appointments_list.html', {
+        'appointments': appointments,
+        'selected_date': selected_date,
+        'doctor': doctor  # Pass the doctor's information to the template
+    })
 @csrf_exempt
 def update_appointment_status(request, appointment_id):
     if request.method == 'POST':
@@ -186,6 +197,13 @@ def update_appointment_status(request, appointment_id):
             return JsonResponse({'status': 'invalid status'}, status=400)
     return JsonResponse({'status': 'bad request'}, status=400)
 
+
+def complete_appointment(request, appointment_id):
+    if request.method == 'POST':
+        appointment = Appointments.objects.get(id=appointment_id)
+        appointment.status = Appointments.COMPLETED
+        appointment.save()
+        return redirect('base:appointment_list')
 
 # def create_appointment(request):
 #     if request.method == 'POST':

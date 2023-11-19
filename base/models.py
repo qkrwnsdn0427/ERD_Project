@@ -57,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['email', 'name', 'birth_date', 'address', 'gender', 'phone_num', 'role']
 
     def __str__(self):
-        return self.user_id
+        return f"ID: {self.user_id} 이름:  {self.name}"
 
 
 # Patient 모델 정의
@@ -77,7 +77,7 @@ class Patient(models.Model):
     image = models.CharField(max_length=50, null=True)
 
     def __str__(self):
-        return self.first_name
+        return f"{self.last_name} {self.first_name}"
 
 
 class TestRecords(models.Model):
@@ -197,4 +197,4 @@ class Appointments(models.Model):
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=PENDING)
 
     def __str__(self):
-        return f"{self.doctor.name} - {self.patient.first_name} - {self.appointment_date.strftime('%Y-%m-%d')} {self.appointment_time.strftime('%H:%M')}"
+        return f"{self.doctor.name} - {self.patient.last_name} {self.patient.first_name} - {self.appointment_date.strftime('%Y-%m-%d')} {self.appointment_time.strftime('%H:%M')}"

@@ -7,16 +7,15 @@
     <button type="submit">날짜 선택</button>
 </form>
 <p>날짜: {{ selected_date }}</p>
-
-{% if appointments %}
-    <!-- 모든 예약이 같은 의사를 위한 것이라고 가정 -->
+<!-- 모든 예약이 같은 의사를 위한 것이라고 가정 -->
     <div>
         <h3>의사 정보</h3>
-        <p>이름: {{ appointments.first.doctor.name }}</p>
-        <p>과: {{ appointments.first.doctor.department }}</p>
-        <p>치료실: {{ appointments.first.doctor.position }}</p>
+        <p>이름: {{ doctor.name }}</p>
+        <p>과: {{ doctor.department }}</p>
+        <p>치료실: {{ doctor.position }}</p>
         <p>대기 인원 수: {{ appointments.count }}</p>
     </div>
+{% if appointments %}
 
     {% for appointment in appointments %}
         <div>
@@ -29,7 +28,10 @@
             <p>증상: {{ appointment.symptoms }}</p>
             <p>목적: {{ appointment.purpose }}</p>
             <button class="call-patient" data-appointment-id="{{ appointment.id }}">환자 호출</button>
-            <button class="complete-appointment" data-appointment-id="{{ appointment.id }}" style="display: none;">치료 완료</button>
+            <form method="post" action="{% url 'base:complete_appointment' appointment.id %}">
+                {% csrf_token %}
+                <button type="submit">진료 완료</button>
+            </form>
         </div>
     {% endfor %}
 {% else %}
